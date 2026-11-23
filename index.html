@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="de-CH">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#e3120b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Marketing">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<title>Marketing-Trainer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,600&display=swap" rel="stylesheet">
+<style>
+/* VOICE: ruhiger Prüfungs-Coach, klar und sachlich, wie ein gutes Lehrmittel
+   IDEA: eine Prüfungskarte aus einem Fachmagazin – Frage, Antworten, Kommentar
+   PICTURE: die Quizkarte selbst, gross oben, daneben das Kompetenz-Raster
+   COLOUR and TYPE: Weiss, Tinte, Signalrot als Akzent, Schiefer für Fortschritt; Source Serif 4 + Inter
+   LAYOUT: rote Marke oben links, Modusleiste, Karte links breit, Kompetenzen rechts, darunter Hinweise */
+:root{color-scheme:light dark;
+--bg:light-dark(#ffffff,#10191e);--ink:light-dark(#121212,#eef2f4);--mute:light-dark(#5b6670,#9fb0ba);
+--red:light-dark(#e3120b,#ff4a3d);--slate:light-dark(#2e6f8e,#6fb3d3);--panel:light-dark(#e3ecf0,#17252c);
+--line:light-dark(#d5dee3,#2a3a43);--ok:light-dark(#1d7a4a,#5cc98d);--okbg:light-dark(#e3f3ea,#14301f);--bad:light-dark(#b3261e,#ff7a70);--badbg:light-dark(#fbe6e4,#3a1714);--card:light-dark(#fff,#132028)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Inter,system-ui,sans-serif;overflow-x:clip}
+h1,h2,h3{font-family:"Source Serif 4",Georgia,serif;font-weight:600;line-height:1.1;text-wrap:balance;margin:0}
+.wrap{max-width:1240px;margin:0 auto;padding:0 max(4vw,16px)}
+header{border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top)}
+body{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right);padding-bottom:env(safe-area-inset-bottom)}
+.top{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:18px 0 14px}
+.tab{background:var(--red);color:#fff;font-weight:700;padding:6px 12px;font-size:14px}
+.top h1{font-size:clamp(26px,3.4vw,36px)}
+.stats{margin-left:auto;display:flex;gap:18px;flex-wrap:wrap;font-size:14px;color:var(--mute)}
+.stats b{color:var(--ink);font-size:17px;display:block;font-weight:700}
+.modes{display:flex;gap:4px;flex-wrap:wrap;padding-bottom:0}
+.modes button{background:none;border:0;border-bottom:3px solid transparent;padding:10px 12px;font:600 15px Inter,sans-serif;color:var(--mute);cursor:pointer;min-height:44px}
+.modes button[aria-pressed=true]{color:var(--ink);border-color:var(--red)}
+.filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:16px 0 4px}
+.filters label{font-size:13px;color:var(--mute);margin-right:2px}
+select{font:16px Inter,sans-serif;padding:8px 10px;border:1px solid var(--line);background:var(--card);color:var(--ink);min-height:44px;border-radius:4px}
+.grid{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);gap:28px;padding:18px 0 40px}
+@media(max-width:900px){.grid{grid-template-columns:minmax(0,1fr)}}
+.card{background:var(--card);border:1px solid var(--line);border-top:4px solid var(--ink);padding:clamp(18px,3vw,32px);min-height:420px}
+.meta{display:flex;gap:10px;flex-wrap:wrap;font-size:13px;color:var(--mute);margin-bottom:14px}
+.meta span{background:var(--panel);padding:2px 8px;border-radius:3px}
+.q{font-size:clamp(22px,2.6vw,30px);margin-bottom:22px}
+.opts{display:grid;gap:10px}
+.opt{display:flex;gap:12px;align-items:flex-start;text-align:left;width:100%;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:12px 14px;font:16px/1.45 Inter,sans-serif;color:var(--ink);cursor:pointer;min-height:52px}
+.opt:hover:not(:disabled){border-color:var(--slate)}
+.opt .k{flex:none;width:26px;height:26px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;font-size:13px;font-weight:700;color:var(--mute)}
+.opt.ok{background:var(--okbg);border-color:var(--ok)}.opt.ok .k{background:var(--ok);color:#fff;border-color:var(--ok)}
+.opt.bad{background:var(--badbg);border-color:var(--bad)}.opt.bad .k{background:var(--bad);color:#fff;border-color:var(--bad)}
+.opt:disabled{cursor:default}
+.fb{margin-top:20px;border-top:1px solid var(--line);padding-top:16px;animation:in .25s ease}
+@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.fb{animation:none}}
+.verdict{font-weight:700;font-size:17px;margin-bottom:6px}.verdict.ok{color:var(--ok)}.verdict.bad{color:var(--bad)}
+.tip{background:var(--panel);padding:10px 14px;margin-top:12px;font-size:15px;border-left:3px solid var(--slate)}
+.ai-box{margin-top:12px;padding:12px 14px;border:1px dashed var(--slate);font-size:15px;white-space:pre-wrap}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;align-items:center}
+.btn{font:600 15px Inter,sans-serif;padding:10px 16px;min-height:44px;border-radius:4px;border:1px solid var(--ink);background:var(--ink);color:var(--bg);cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.btn.ghost{background:none;color:var(--ink);border-color:var(--line)}
+.btn.red{background:var(--red);border-color:var(--red);color:#fff}
+.btn:disabled{opacity:.5;cursor:default}
+button:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--slate);outline-offset:2px}
+.needai{display:none!important}body.ai .needai{display:inline-flex!important}body.ai .noai{display:none}
+aside h3{font-size:22px;margin-bottom:4px}
+.sub{font-size:13px;color:var(--mute)}
+.skill{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;padding:9px 0;border-bottom:1px solid var(--line);cursor:pointer;background:none;border-left:0;border-right:0;border-top:0;width:100%;text-align:left;color:var(--ink);font:inherit}
+.skill:hover .name{color:var(--slate)}
+.skill .name{font-size:15px;font-weight:500}.skill .pct{font-size:14px;font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
+.bar{grid-column:1/-1;height:6px;background:var(--panel);border-radius:3px;overflow:hidden}.bar i{display:block;height:100%;background:var(--slate)}
+.skill.weak .bar i{background:var(--red)}
+.big{font:600 clamp(40px,5vw,56px)/1 "Source Serif 4",serif}
+.panel{background:var(--panel);padding:16px;margin-top:18px}
+textarea{width:100%;min-height:180px;font:16px/1.5 Inter,sans-serif;padding:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:4px}
+ul.clean{margin:8px 0;padding-left:20px}
+.prog{height:4px;background:var(--panel);margin-bottom:16px}.prog i{display:block;height:100%;background:var(--red)}
+.note{font-size:13px;color:var(--mute);padding:20px 0 40px;border-top:1px solid var(--line)}
+.review{border-top:1px solid var(--line);padding:12px 0;font-size:15px}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:4px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s;max-width:90vw}
+.toast.on{opacity:1}
+@media(max-width:600px){.stats{margin-left:0;width:100%}.card{min-height:0}}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <div class="top">
+    <span class="tab">Weiterbildung</span>
+    <h1>Marketing-Trainer</h1>
+    <div class="stats" id="stats"></div>
+  </div>
+  <nav class="modes" id="modes">
+    <button data-m="train" aria-pressed="true">Training</button>
+    <button data-m="weak" aria-pressed="false">Schwächen</button>
+    <button data-m="exam" aria-pressed="false">Prüfung</button>
+  </nav>
+</div></header>
+
+<main class="wrap">
+  <div class="filters">
+    <label for="fT">Thema</label><select id="fT"></select>
+    <label for="fL">Niveau</label><select id="fL"><option value="0">Alle Niveaus</option><option value="1">Basis</option><option value="2">Fortgeschritten</option><option value="3">Profi</option></select>
+  </div>
+  <div class="grid">
+    <section class="card" id="card" aria-live="polite"></section>
+    <aside>
+      <h3>Deine Kompetenzen</h3>
+      <div class="sub" id="overall"></div>
+      <div id="skills"></div>
+      <div class="panel" id="next"></div>
+    </aside>
+  </div>
+  <div class="note">
+    Wiederholung nach Lernkarten-Prinzip: Richtige Antworten kommen in immer grösseren Abständen wieder (1, 3, 7, 16, 35 Tage), falsche schon nach 10 Minuten. Eine Kompetenz gilt als sicher, wenn du alle Fragen eines Themas mehrmals hintereinander richtig hattest.<br>
+    Fragen zum Recht sind Lernstoff, keine Rechtsberatung (Stand Nov. 2026). Dein Fortschritt wird auf diesem Gerät gespeichert.
+    <span id="sync"></span>
+    <button class="btn ghost" id="reset" style="margin-left:8px;min-height:36px;padding:6px 12px;font-size:13px">Fortschritt zurücksetzen</button>
+  </div>
+</main>
+<div class="toast" id="toast"></div>
+
+<script>
+{
+const T={grund:"Strategie & Grundlagen",seo:"SEO",ads:"Google Ads",social:"Social & Meta Ads",content:"Content & Copy",mail:"E-Mail & CRM",data:"Analytics & Tracking",cro:"CRO & UX",psy:"Psychologie & Nudging",recht:"Recht Schweiz"};
+const LV={1:"Basis",2:"Fortgeschritten",3:"Profi"};
+/* [thema, niveau, frage, [richtig, falsch, falsch, falsch], erklärung, praxis-tipp] – die erste Antwort ist immer die richtige, angezeigt wird gemischt */
+const B=[
+["grund",1,"Wofür steht STP im Marketing?",["Segmentierung, Targeting, Positionierung","Strategie, Taktik, Planung","Sales, Traffic, Performance","Suche, Text, Promotion"],"Zuerst teilst du den Markt in Segmente, dann wählst du die Zielsegmente, dann legst du fest, wie du im Kopf dieser Zielgruppe wahrgenommen werden willst. Ohne STP wird jede Kampagne beliebig.","Outbreak: Nicht «alle mit Tattoo-Wunsch», sondern z. B. 20–35-Jährige in Luzern, die feine Fineline-Arbeiten suchen."],
+["grund",1,"Welches Ziel ist SMART formuliert?",["30 Kontaktanfragen über die Website bis 31. März, mit 1'500 CHF Budget","Mehr Bekanntheit auf Instagram","Die Website soll besser ranken","Wir wollen dieses Jahr stark wachsen"],"SMART = spezifisch, messbar, erreichbar (achievable), relevant, terminiert. Nur so kannst du am Ende sagen, ob eine Massnahme funktioniert hat.","Performandes: Setz dir für jedes Kundenprojekt ein SMART-Ziel und miss es – das wird später deine Case Study."],
+["grund",2,"Deine Bruttomarge ist 40 %. Ab welchem ROAS verdienst du mit Ads Geld (ohne Fixkosten)?",["Über 250 %","Über 140 %","Über 400 %","Über 100 %"],"Break-even-ROAS = 1 / Marge = 1 / 0,4 = 2,5 → 250 %. Bei 100 % ROAS holst du nur den Umsatz zurück, nicht die Warenkosten.","Anti Matcha Club: Rechne die Marge pro Beutel aus – daraus ergibt sich dein Mindest-ROAS für Meta Ads."],
+["grund",2,"Als Faustregel für ein gesundes Geschäftsmodell gilt ein LTV:CAC-Verhältnis von etwa …",["3:1","1:1","1:3","Mindestens 10:1"],"Bei 1:1 verlierst du nach allen Kosten Geld. Deutlich über 5:1 kann heissen, dass du zu wenig ins Wachstum investierst.",""],
+["grund",2,"Im See-Think-Do-Care-Modell: Wer ist in «Think»?",["Menschen mit kommerzieller Absicht, die aber noch nicht kaufbereit sind","Bestehende Kunden mit mindestens zwei Käufen","Das grösste Publikum ganz ohne Kaufabsicht","Leute, die gerade im Checkout sind"],"See = grösstes Publikum ohne Absicht, Think = erste kommerzielle Absicht, Do = will jetzt kaufen, Care = bestehende Kunden. Jede Stufe braucht andere Inhalte und KPIs (Modell von Avinash Kaushik).",""],
+["grund",3,"Was empfehlen Binet & Field («The Long and the Short of It») grob als Budgetaufteilung im B2C?",["Etwa 60 % Markenaufbau, 40 % Aktivierung","Etwa 10 % Marke, 90 % Performance","Immer 50/50, in jeder Branche","100 % Performance, weil messbar"],"Markenaufbau schafft langfristig Nachfrage, Aktivierung erntet sie kurzfristig. Die Quote variiert je nach Kategorie; im B2B liegt sie eher bei rund 46/54.","Performandes: Kunden, die nur Performance wollen, gerade darauf hinweisen – das zeigt Strategie-Kompetenz."],
+["grund",1,"Dein eigener Newsletter gehört zu welcher Medienart?",["Owned Media","Paid Media","Earned Media","Bought Media"],"Owned = eigene Kanäle (Website, Newsletter, eigene Profile). Paid = gekaufte Reichweite. Earned = Erwähnungen, Bewertungen, Shares durch andere. Social-Profile sind eher «gemietet», weil die Plattform die Regeln macht – Website und Mailliste gehören wirklich dir.",""],
+["grund",3,"Was ist der wichtigste Prüfstein einer guten Positionierung?",["Relevant für die Zielgruppe, klar anders als die Konkurrenz und glaubwürdig belegbar","Sie spricht möglichst alle Zielgruppen an","Sie zählt vor allem Produktfeatures auf","Sie ist möglichst kreativ formuliert"],"Positionierung ist Verzicht: Wer alle ansprechen will, bleibt austauschbar. Relevanz × Differenzierung × Glaubwürdigkeit.","Performandes: Was kann nur du? IT- und Daten-Hintergrund plus Marketing – Websites, die messbar Anfragen bringen."],
+["seo",1,"Was macht ein canonical-Tag?",["Zeigt Google die bevorzugte URL bei doppelten oder sehr ähnlichen Inhalten","Verhindert, dass eine Seite gecrawlt wird","Leitet Besucher dauerhaft auf eine andere URL um","Markiert eine Seite als Werbung"],"Das Canonical ist ein starker Hinweis, keine Anweisung. Typische Fälle: Filter- und Parameter-URLs, Druckversionen, Produkt in mehreren Kategorien.",""],
+["seo",1,"«tattoo studio luzern termin» – welche Suchintention?",["Transaktional","Informational","Navigational","Keine erkennbare Intention"],"Informational = lernen, navigational = zu einer bestimmten Seite, kommerziell = vergleichen, transaktional = jetzt handeln. Transaktionale Suchen brauchen eine Landingpage mit klarem CTA, keinen Blogartikel.","Outbreak: Die Startseite oder eine Seite «Termin buchen» auf genau solche Suchen optimieren."],
+["seo",2,"Du willst eine bereits indexierte Seite aus Google entfernen. Was ist richtig?",["noindex setzen und die Seite crawlbar lassen","Die Seite in robots.txt per Disallow sperren","Die Meta-Description löschen","Die Seite aus der Navigation entfernen"],"robots.txt verhindert das Crawling, nicht die Indexierung. Sperrst du die Seite, sieht Google dein noindex nie. Für eine schnelle, temporäre Entfernung zusätzlich das Entfernen-Tool der Search Console.",""],
+["seo",2,"Welche drei Metriken bilden aktuell die Core Web Vitals?",["LCP, INP, CLS","LCP, FID, TTFB","FCP, CLS, TBT","INP, TTFB, Speed Index"],"INP hat im März 2024 FID abgelöst. Gute Werte: LCP ≤ 2,5 s, INP ≤ 200 ms, CLS ≤ 0,1 – gemessen an echten Nutzerdaten (75. Perzentil).","Prüf performandes.com und outbreak-tattoo.com in PageSpeed Insights und notier die drei Werte."],
+["seo",1,"Ist die Meta-Description ein direkter Rankingfaktor?",["Nein, aber sie beeinflusst die Klickrate im Suchergebnis","Ja, einer der stärksten Faktoren","Ja, aber nur bei lokalen Suchen","Nein, und Google zeigt sie nie an"],"Google schreibt sie oft um. Eine gute Description ist wie eine Mini-Anzeige: Nutzen, Beleg, Handlungsaufforderung, etwa 150–160 Zeichen.",""],
+["seo",2,"Welche drei Hauptfaktoren nennt Google für das lokale Ranking (Maps / Local Pack)?",["Relevanz, Entfernung, Bekanntheit","Budget, Relevanz, Öffnungszeiten","Anzahl Fotos, Posts, Keywords im Namen","Domainalter, Backlinks, Ladezeit"],"Bekanntheit (Prominence) umfasst u. a. Anzahl und Qualität der Bewertungen, Erwähnungen im Web und Links. Keywords in den Firmennamen zu stopfen verstösst gegen die Richtlinien.","Outbreak: Hauptkategorie «Tattoostudio», Bewertungen aktiv einholen und alle beantworten, regelmässig neue Fotos."],
+["seo",3,"Eine Website hat /de-ch/ und /fr-ch/. Wozu dient hreflang?",["Google zeigt Nutzern die passende Sprach- bzw. Regionsversion","Es verbessert direkt das Ranking beider Seiten","Es verhindert die Indexierung der Zweitsprache","Es übersetzt die Seite automatisch"],"Jede Version verweist auf sich selbst und auf alle Alternativen – gegenseitig, sonst wird es ignoriert. Optional x-default für alle anderen.",""],
+["seo",3,"Wofür steht E-E-A-T in Googles Quality Rater Guidelines?",["Experience, Expertise, Authoritativeness, Trustworthiness","Engagement, Expertise, Authority, Traffic","Experience, Engagement, Accessibility, Trust","Expertise, Evidence, Authority, Technology"],"Trust ist das Zentrum. E-E-A-T ist kein einzelner messbarer Faktor, sondern beschreibt, was Googles Systeme belohnen wollen: echte Erfahrung, nachweisbares Fachwissen.","Performandes: Case Studies mit echten Zahlen und eine Über-mich-Seite mit deinem Werdegang stärken E-E-A-T."],
+["seo",1,"Du änderst eine URL dauerhaft. Welche Weiterleitung?",["301","302","404","503"],"301 = dauerhaft, die Signale gehen auf die neue URL über. 302 = vorübergehend. Bei jedem Relaunch eine Weiterleitungsliste alt → neu machen.","Beim Wechsel von WordPress zu Craft CMS bei Performandes: alle alten URLs prüfen."],
+["ads",1,"Aus welchen drei Komponenten besteht der Qualitätsfaktor?",["Erwartete CTR, Anzeigenrelevanz, Nutzererfahrung mit der Landingpage","CPC, Budget, CTR","Gebot, Conversions, Impressionen","Kontoalter, Gebot, Anzeigenrelevanz"],"Der Qualitätsfaktor (1–10) ist ein Diagnosewert pro Keyword. Er fliesst nicht direkt in die Auktion ein, zeigt aber, wo du ansetzen musst.",""],
+["ads",1,"Was fliesst NICHT in den Anzeigenrang (Ad Rank) ein?",["Das Tagesbudget der Kampagne","Das Gebot","Die Anzeigenqualität","Der Kontext der Suche (Gerät, Ort, Zeit)"],"Das Budget bestimmt, wie oft du an Auktionen teilnehmen kannst – nicht, wie weit oben du erscheinst.",""],
+["ads",1,"Welche Keyword-Option hat die engste Abdeckung?",["Genau passend [keyword]","Passende Wortgruppe «keyword»","Weitgehend passend","Modifiziert weitgehend +keyword"],"Modifiziert weitgehend wurde 2021 abgeschafft. Auch «genau passend» deckt heute Varianten mit gleicher Bedeutung ab – den Suchbegriffsbericht musst du trotzdem prüfen.",""],
+["ads",2,"Wie viele Anzeigentitel kann eine responsive Suchanzeige maximal haben?",["15 (je 30 Zeichen)","3 (je 30 Zeichen)","10 (je 90 Zeichen)","5 (je 25 Zeichen)"],"Dazu bis zu 4 Beschreibungen à 90 Zeichen. Ziel ist eine Anzeigeneffektivität von «Gut» oder «Sehr gut»; Titel nur wenn nötig fixieren.",""],
+["ads",2,"Outbreak bewirbt «tattoo luzern». Klicks kommen von «tattoo entfernen luzern». Was tust du?",["«entfernen» als auszuschliessendes Keyword hinzufügen","Das Gebot für «tattoo luzern» erhöhen","Auf weitgehend passend umstellen","Den Anzeigentext verlängern"],"Ausschlüsse sparen Budget für irrelevante Klicks. Den Suchbegriffsbericht am Anfang wöchentlich durchgehen.","Leg für Outbreak gleich eine Ausschlussliste an: entfernen, laser, kosten krankenkasse, job, ausbildung."],
+["ads",2,"Dein max. CPC ist 2.00 CHF. Was zahlst du pro Klick?",["Höchstens 2.00 CHF, oft weniger – nur so viel, wie nötig ist, um den Rang zu halten","Immer genau 2.00 CHF","Immer 1 Rappen mehr als der Mitbewerber, egal wie hoch","Den Durchschnitt aller Gebote in der Auktion"],"Darum lohnt sich Qualität: Bessere Anzeigen und Landingpages senken den tatsächlichen CPC für dieselbe Position.",""],
+["ads",3,"Wann ist Smart Bidding mit Ziel-ROAS sinnvoll?",["Wenn Conversion-Werte sauber getrackt werden und genug Conversion-Daten vorhanden sind","Bei einer neuen Kampagne ohne Conversion-Tracking","Wenn du nur Reichweite willst","Wenn du keine Werte erfasst"],"Ohne Werte keine Wertoptimierung. Häufiger Weg: Start mit «Conversions maximieren», danach Ziel-CPA oder Ziel-ROAS, wenn genug Daten da sind.",""],
+["ads",3,"Was ist typisch für Performance-Max-Kampagnen?",["Eine Kampagne liefert auf allen Google-Kanälen aus (Suche, YouTube, Display, Gmail, Maps, Discover)","Sie laufen nur im Suchnetzwerk","Man steuert jedes Keyword manuell","Sie brauchen kein Conversion-Ziel"],"Du gibst Asset-Gruppen und Zielgruppensignale, Google optimiert. Stark im E-Commerce mit Produktfeed. Risiko: Sie greift Brand-Suchen ab – Markenausschlüsse nutzen.","Anti Matcha Club: Mit Shopify-/Shop-Feed wäre PMax ein Kandidat, sobald genug Käufe getrackt sind."],
+["ads",2,"1'200 Impressionen, 48 Klicks, 3 Conversions. CTR und Conversion-Rate?",["CTR 4 %, CR 6,25 %","CTR 0,25 %, CR 4 %","CTR 4 %, CR 0,25 %","CTR 6,25 %, CR 4 %"],"CTR = Klicks / Impressionen = 48 / 1'200 = 4 %. Conversion-Rate = Conversions / Klicks = 3 / 48 = 6,25 %.",""],
+["social",1,"Welches ist KEIN Kampagnenziel im Meta-Werbeanzeigenmanager?",["Rankings","Bekanntheit","Leads","Umsatz"],"Die sechs Ziele: Bekanntheit, Traffic, Interaktion, Leads, App-Promotion, Umsatz. Das Ziel bestimmt, auf wen der Algorithmus optimiert – also immer das Ziel wählen, das du wirklich willst.",""],
+["social",1,"300 CHF Budget, 60'000 Impressionen. Wie hoch ist der CPM?",["5.00 CHF","0.005 CHF","50.00 CHF","20.00 CHF"],"CPM = Kosten / Impressionen × 1'000 = 300 / 60'000 × 1'000 = 5 CHF.",""],
+["social",2,"Wozu nutzt man die Meta Conversions API zusätzlich zum Pixel?",["Um Events serverseitig zu senden – robuster gegen Adblocker und Browser-Einschränkungen","Damit Posts organisch mehr Reichweite bekommen","Um Instagram-Follower zu importieren","Sie ersetzt das Consent-Banner"],"Pixel und CAPI laufen parallel; doppelte Events werden über eine gemeinsame event_id entfernt. Einwilligung braucht es trotzdem.",""],
+["social",2,"Frequenz 7,5 in 7 Tagen, die CTR sinkt, der CPM steigt. Diagnose?",["Werbemüdigkeit – neue Creatives oder grössere Zielgruppe","Das Budget ist zu tief","Der Pixel ist kaputt","Alles normal, so lassen"],"Dieselben Leute sehen dieselbe Anzeige zu oft. Lösung: Creative-Rotation, breitere Zielgruppe oder weniger Budget auf diese Zielgruppe.",""],
+["social",1,"Was entscheidet bei Reels und TikTok am stärksten über die Performance?",["Die ersten 1–3 Sekunden (Hook)","Die Anzahl Hashtags","Die Länge der Caption","Die exakte Posting-Minute"],"Wer nicht hängen bleibt, wischt weiter – und der Algorithmus misst genau das. Bewegung, Gesicht, Text-Overlay oder eine provokante Aussage gleich am Anfang.","Outbreak: Mit dem fertigen Tattoo starten, dann den Prozess zeigen – nicht umgekehrt."],
+["social",2,"Reichweite 5'000, 250 Interaktionen. Engagement-Rate auf Reichweite?",["5 %","2 %","0,5 %","20 %"],"250 / 5'000 = 5 %. Speichern und Teilen sind stärkere Signale als Likes – sie zeigen echten Nutzen.",""],
+["social",3,"Bei Meta heisst es oft «Creative ist das neue Targeting». Was ist gemeint?",["Breite Zielgruppen und vielfältige Creatives – der Algorithmus findet die Leute über das Creative","Man braucht keine Creatives mehr","Detailliertes Interessen-Targeting ist immer besser","Nur ein Creative pro Kampagne nutzen"],"Mit weniger Tracking-Signalen kann Meta über enge Interessen schlechter steuern. Unterschiedliche Creatives sprechen unterschiedliche Leute an – das ist dein Targeting.","Anti Matcha Club: Drei Winkel testen – die «Anti»-Haltung mit Humor, Produkt-Close-up, UGC von echten Kunden."],
+["social",3,"Was ist die beste Quelle für eine ähnliche Zielgruppe (Lookalike)?",["Käufer mit hohem Warenkorbwert","Alle Website-Besucher der letzten 3 Tage","Alle Follower inklusive Bots","Eine zufällige E-Mail-Liste"],"Die Qualität der Quelle zählt mehr als die Grösse. Meta braucht mindestens 100 Personen aus einem Land; empfohlen sind ca. 1'000 bis 50'000.",""],
+["content",1,"Wofür steht AIDA?",["Attention, Interest, Desire, Action","Awareness, Insight, Decision, Activation","Audience, Idea, Design, Ad","Attention, Information, Delivery, Action"],"Das klassische Modell für Werbung und Landingpages: Aufmerksamkeit holen, Interesse wecken, Wunsch erzeugen, zur Handlung führen.",""],
+["content",2,"Was ist das Pillar-Cluster-Modell?",["Eine umfassende Hauptseite zu einem Thema, gegenseitig verlinkt mit vielen Detailartikeln","Eine Seite mit möglichst vielen Keywords","Ein Rhythmus von drei Posts pro Woche","Ein Instagram-Format für Karussells"],"Die Pillar-Seite deckt das Thema breit ab, die Cluster gehen in die Tiefe. Die interne Verlinkung zeigt Google deine Themenkompetenz.","Performandes: Pillar «Website für KMU», Cluster wie «Was kostet eine Website in der Schweiz?» oder «Craft CMS vs. WordPress»."],
+["content",1,"Was ist Content-Repurposing?",["Einen Inhalt in mehrere Formate und Kanäle umwandeln","Fremden Content kopieren","Alten Content löschen","Jeden Inhalt nur einmal posten"],"Beispiel: Blogartikel → Karussell → Reel → Newsletter → LinkedIn-Post. Einmal denken, fünfmal nutzen.",""],
+["content",2,"Warum performt UGC in Ads oft besser als Hochglanz-Werbung?",["Es wirkt authentisch, passt in den Feed und liefert Social Proof","Meta spielt es kostenlos aus","Es braucht keine Nutzungsrechte","Es sind immer längere Videos"],"UGC sieht aus wie normaler Content und unterbricht weniger. Nutzungsrechte trotzdem immer schriftlich einholen.",""],
+["content",2,"Wofür steht die Copywriting-Formel PAS?",["Problem, Agitate, Solution","Product, Audience, Sales","Promise, Action, Story","Price, Advantage, Scarcity"],"Problem benennen, den Schmerz verstärken, dann die Lösung zeigen. Funktioniert besonders gut für Ads und E-Mails.",""],
+["content",3,"Welche Headline ist für eine Landingpage von Performandes am stärksten?",["«Websites, die aus Besuchern Anfragen machen – für KMU in Luzern»","«Willkommen bei Performandes»","«Wir sind eine innovative, kreative Agentur»","«Unsere Leistungen im Überblick»"],"Nutzen plus Zielgruppe plus Spezifität. Schreib über das Ergebnis des Kunden, nicht über dich.",""],
+["content",2,"Was gehört in einen Brand-Voice-Guide?",["Tonalität mit Do's und Don'ts samt Beispielen, Wortwahl, Ansprache (du/Sie)","Nur Logo und Farben","Die Produktpreise","Die Social-Media-Passwörter"],"Ein Voice-Guide sorgt dafür, dass alle Texte nach derselben Marke klingen – auch wenn mehrere Leute schreiben.","Anti Matcha Club: Drei Adjektive für die Stimme festlegen, je ein Satz «so ja» und «so nicht»."],
+["content",3,"Welcher Inhalt passt am besten ans Ende des Funnels (BOFU)?",["Eine Case Study mit Ergebnissen plus Angebot für ein Erstgespräch","Ein viraler Meme-Post","Ein allgemeiner Ratgeber «Was ist SEO?»","Eine Behind-the-Scenes-Story ohne CTA"],"Unten im Funnel braucht es Beweise und eine klare nächste Handlung. Ratgeber gehören nach oben, Memes in die Reichweite.",""],
+["mail",1,"Wozu dient das Double-Opt-in?",["Es belegt die Einwilligung und hält die Liste sauber","Es verdoppelt die Öffnungsrate","Es ist ein Rabatt für Neuabonnenten","Es ersetzt die Abmeldemöglichkeit"],"Nach der Anmeldung bestätigt die Person per Klick in einer Mail. So kannst du die Einwilligung beweisen und vermeidest Tippfehler- und Spam-Adressen.",""],
+["mail",2,"Warum ist die Öffnungsrate seit 2021 nur noch bedingt aussagekräftig?",["Apple Mail Privacy Protection lädt Tracking-Pixel automatisch und bläht Öffnungen auf","E-Mail-Clients zeigen keine Bilder mehr","Google verbietet das Messen von Öffnungen","Öffnungen sieht man nur noch in GA4"],"Besser auf Klickrate, Conversions und Umsatz pro Empfänger schauen.",""],
+["mail",2,"Wofür steht RFM-Segmentierung?",["Recency, Frequency, Monetary","Reach, Frequency, Media","Retention, Funnel, Margin","Relevance, Feedback, Messaging"],"Wann zuletzt gekauft, wie oft, wie viel. So findest du deine besten Kunden und die, die gerade abspringen.",""],
+["mail",1,"Welche E-Mail-Automation hat typischerweise das höchste Engagement?",["Die Welcome-Serie direkt nach der Anmeldung","Der monatliche Newsletter","Die Reaktivierungsmail nach 12 Monaten","Die Mail zu geänderten AGB"],"Direkt nach der Anmeldung ist das Interesse am grössten. Nutz die Welcome-Serie, um Marke, Bestseller und Nutzen vorzustellen.","Anti Matcha Club: 3 Mails – Story der Marke, Bestseller, Social Proof mit einem Anreiz."],
+["mail",2,"Ø Bestellwert 50 CHF, 4 Käufe pro Jahr, Kunden bleiben 3 Jahre. Umsatz-CLV?",["600 CHF","200 CHF","150 CHF","1'200 CHF"],"50 × 4 × 3 = 600 CHF. Für Entscheide besser mit Deckungsbeitrag rechnen, also mal Marge.",""],
+["mail",3,"Seit 2024 verlangen Gmail und Yahoo von Massenversendern unter anderem …",["SPF, DKIM und DMARC sowie Abmeldung mit einem Klick","Ein Logo im Header","Mindestens 10'000 Abonnenten","Versand nur zwischen 8 und 18 Uhr"],"Gilt für Versender von über 5'000 Mails pro Tag an Gmail. Die Spamrate soll unter 0,3 % bleiben – sonst landet alles im Spam.",""],
+["mail",3,"Was ist eine sinnvolle Struktur für einen Warenkorbabbrecher-Flow?",["Mail 1 nach ca. 1 h (Erinnerung), Mail 2 nach ca. 24 h (Einwände, Social Proof), optional Mail 3 mit Anreiz","Sofort 20 % Rabatt, dann täglich eine Mail","Eine einzige Mail nach 30 Tagen","Gar keine, das wirkt aufdringlich"],"Rabatt nicht gleich in der ersten Mail – sonst lernen Kunden, absichtlich abzubrechen.",""],
+["data",1,"Welcher Parameter ist KEIN Standard-UTM?",["utm_channel","utm_source","utm_medium","utm_campaign"],"Standard: utm_source, utm_medium, utm_campaign, utm_term, utm_content (GA4 kennt zusätzlich z. B. utm_id). Immer einheitlich und klein schreiben.","Leg dir eine UTM-Vorlage in Notion an, z. B. source=instagram, medium=social, campaign=2026-12-weihnachten."],
+["data",1,"Worauf basiert das Datenmodell von GA4?",["Ereignissen (Events)","Sitzungen mit Hits wie in Universal Analytics","Nur Conversions","Cookies pro Seite"],"Alles ist ein Event mit Parametern – auch Seitenaufrufe (page_view). Das macht GA4 flexibel, aber du musst sauber planen, was du misst.",""],
+["data",2,"Wann zählt eine Sitzung in GA4 als «mit Interaktion»?",["Länger als 10 Sekunden ODER Schlüsselereignis ODER mindestens 2 Seitenaufrufe","Nur bei einem Kauf","Sobald die Seite geladen ist","Ab 60 Sekunden Verweildauer"],"Die Absprungrate in GA4 = 100 % minus Interaktionsrate. Conversions heissen in GA4 seit 2024 «Schlüsselereignisse».",""],
+["data",2,"Was ist die Grundlogik im Google Tag Manager?",["Tags, Trigger, Variablen","Kampagnen, Anzeigengruppen, Keywords","Events, Sitzungen, Nutzer","Container, Cookies, Consent"],"Tag = was passiert (z. B. GA4-Event), Trigger = wann, Variable = welche Werte. Vor dem Veröffentlichen immer im Vorschaumodus testen.",""],
+["data",2,"Was bewirkt der Google Consent Mode v2?",["Google-Tags passen ihr Verhalten an die Einwilligung an; fehlende Daten können modelliert werden","Er ersetzt das Cookie-Banner","Er macht Tracking ohne Einwilligung überall legal","Er ist nur für YouTube relevant"],"Neue Signale: ad_user_data und ad_personalization. Für Nutzer aus EWR, UK und der Schweiz braucht Google Ads das für Remarketing und Personalisierung. Basic vs. Advanced entscheidet, ob ohne Einwilligung cookielose Pings gesendet werden.",""],
+["data",3,"Welches Attributionsmodell ist in GA4 Standard?",["Datengetrieben","Letzter Klick","Erster Klick","Linear"],"Erster Klick, Linear, Zeitverlauf und positionsbasiert wurden 2023 entfernt. Übrig sind datengetrieben und zwei Varianten von «letzter Klick».",""],
+["data",3,"Warum weichen Conversions in Google Ads und GA4 oft voneinander ab?",["Unterschiedliche Attribution, Zählmethode und Zuordnungszeitpunkt (Klickdatum vs. Ereignisdatum)","Eines der Tools ist immer falsch","Wegen der Zeitzone des Browsers","GA4 misst gar keine Conversions"],"Google Ads ordnet Conversions dem Klickdatum zu und zählt nur Google-Klicks; GA4 dem Ereignisdatum und über alle Kanäle. Für die Gebotsoptimierung zählt die Ads-Sicht.",""],
+["cro",1,"3'000 Sitzungen, 75 Bestellungen. Conversion-Rate?",["2,5 %","4 %","0,25 %","25 %"],"75 / 3'000 = 2,5 %. Im E-Commerce sind 1–3 % üblich – entscheidend ist aber die Entwicklung deiner eigenen Zahl.",""],
+["cro",1,"Was erhöht auf einer Landingpage meist die Conversion-Rate?",["Ein klarer Haupt-CTA mit einem Ziel pro Seite","Möglichst viele Links in die ganze Website","Ein Slider mit sechs Botschaften","Ein Formular mit 12 Pflichtfeldern"],"Jede zusätzliche Option lenkt ab. Eine Seite, ein Ziel, ein CTA – wiederholt an den richtigen Stellen.",""],
+["cro",2,"A/B-Test: Nach 2 Tagen und 40 Conversions liegt Variante B 30 % vorne. Was tust du?",["Weiterlaufen lassen bis zur geplanten Stichprobengrösse und mindestens 1–2 volle Wochen","Sofort B als Gewinner ausrollen","Test abbrechen, das Ergebnis ist eindeutig","Variante A löschen und neu starten"],"Frühe Ausschläge sind oft Zufall. Stichprobe vorher berechnen und ganze Wochen laufen lassen, damit Wochentags-Effekte ausgeglichen sind.",""],
+["cro",2,"Wofür nutzt du Tools wie Microsoft Clarity oder Hotjar?",["Heatmaps und Session Recordings: wo Nutzer klicken, scrollen und hängen bleiben","Backlinks aufbauen","E-Mails versenden","Keywords recherchieren"],"Analytics sagt dir, WAS passiert, Recordings zeigen dir, WARUM.","Clarity ist gratis – auf Outbreak einbauen (mit Einwilligung) und eine Woche Recordings auf mobilen Geräten anschauen."],
+["cro",2,"Ein Formular hat 9 Felder und viele Abbrüche. Erster Schritt?",["Auf die wirklich nötigen Felder reduzieren und messen, wo abgebrochen wird","Einen Rabatt anbieten","Den Button rot machen","Mehr Traffic einkaufen"],"Jedes Feld kostet Conversions. Was du erst später brauchst, fragst du später.",""],
+["cro",3,"Wie lautet eine gute Test-Hypothese?",["«Weil Nutzer laut Recordings die Preise suchen, zeigen wir sie weiter oben – erwartet: +10 % Anfragen»","«Wir testen mal einen grünen Button»","«Die neue Seite wird sicher besser»","«Wir ändern Headline, Bilder, Preise und Formular gleichzeitig»"],"Gute Hypothese = Beobachtung + Änderung + erwartetes, messbares Ergebnis. Und nur eine Hauptänderung pro Test.",""],
+["cro",2,"Welche Massnahme verbessert den LCP am direktesten?",["Das Hero-Bild komprimieren (WebP/AVIF), richtig dimensionieren und priorisiert laden","Mehr Text unter den Footer","Zusätzliche Tracking-Skripte","Das Hero-Bild per Lazy Loading verzögern"],"Das LCP-Element nie lazy-loaden; besser fetchpriority=high setzen.","In Craft CMS kannst du mit Image Transforms automatisch passende Grössen und WebP erzeugen."],
+["psy",1,"Was ist ein Nudge nach Thaler & Sunstein?",["Eine Gestaltung der Entscheidungssituation, die Verhalten lenkt, ohne Optionen zu verbieten oder Anreize stark zu verändern","Ein Rabatt von mindestens 20 %","Ein Verbot unerwünschter Optionen","Ein aufdringliches Pop-up"],"Nudges verändern die «Choice Architecture». Die Person bleibt frei, die Alternative zu wählen – das ist der Unterschied zur Manipulation.","Das ist dein Masterarbeits-Thema – erzähl es in Bewerbungen als Beweis, dass du Kaufverhalten verstehst."],
+["psy",1,"Im Checkout ist «Geschenkverpackung» vorausgewählt. Welcher Effekt wirkt hier?",["Default-Effekt","Ankereffekt","Decoy-Effekt","Halo-Effekt"],"Menschen bleiben oft bei der Voreinstellung. Achtung: Eine vorausgewählte kostenpflichtige Zusatzleistung ist in der EU verboten und ein klassisches Dark Pattern.",""],
+["psy",2,"Popcorn: Klein 4.–, Mittel 7.–, Gross 7.50. Wozu dient «Mittel»?",["Als Köder (Decoy), damit «Gross» wie ein Schnäppchen wirkt","Als günstigste Option für Sparer","Um den Durchschnittspreis zu senken","Wegen gesetzlicher Vorgaben"],"Asymmetrische Dominanz: Die Köder-Option ist klar schlechter als die Zieloption und lässt diese attraktiver wirken.","Performandes: Drei Pakete, wobei das mittlere das Ziel ist – und das grosse als Anker dient."],
+["psy",2,"Welches ist KEIN Überzeugungsprinzip nach Cialdini?",["Exklusivität des Preises","Reziprozität","Soziale Bewährtheit","Knappheit"],"Cialdini: Reziprozität, Commitment & Konsistenz, soziale Bewährtheit, Autorität, Sympathie, Knappheit – und seit 2016 Einheit (Unity).",""],
+["psy",2,"«Verpasse nicht 30 CHF Ersparnis» wirkt oft stärker als «Spare 30 CHF». Warum?",["Verlustaversion – Verluste wiegen schwerer als gleich grosse Gewinne","Ankereffekt","Mere-Exposure-Effekt","Mitläufereffekt"],"Aus der Prospect Theory von Kahneman und Tversky. Sparsam einsetzen: Zu viel Verlust-Framing wirkt schnell billig.",""],
+["psy",3,"Was zeigte die bekannte Marmeladen-Studie von Iyengar & Lepper?",["Bei 24 Sorten blieben mehr Leute stehen, bei 6 Sorten kauften aber deutlich mehr","Mehr Auswahl führt immer zu mehr Käufen","Der Preis hatte keinen Einfluss","Leute kaufen am liebsten die teuerste Sorte"],"Choice Overload. Spätere Studien zeigen gemischte Ergebnisse – der Effekt hängt stark vom Kontext ab. Trotzdem: Klare Empfehlungen helfen beim Entscheiden.",""],
+["psy",3,"Welche Massnahme ist ein Dark Pattern und rechtlich heikel?",["Ein Countdown, der bei jedem Neuladen neu startet","Echte Bewertungen mit Sternen","Vorausgewählter Gratis-Versand","«Nur noch 3 an Lager», wenn es stimmt"],"Falsche Knappheit ist Täuschung, kann gegen das UWG verstossen und kostet Vertrauen, sobald es jemand merkt.",""],
+["psy",2,"Welche Form von Social Proof wirkt typischerweise am stärksten?",["Konkret und ähnlich: «87 Kunden aus Luzern haben hier gebucht»","«Wir sind die Besten»","Eine Award-Grafik ohne Kontext","«Viele Menschen mögen uns»"],"Ähnlichkeit und Spezifität machen Social Proof glaubwürdig. Nie erfinden.","Outbreak: Google-Bewertungen mit Vornamen und Motiv direkt neben dem Buchungsbutton."],
+["recht",1,"Seit wann gilt in der Schweiz das revidierte Datenschutzgesetz (revDSG)?",["1. September 2023","25. Mai 2018","1. Januar 2020","1. Januar 2025"],"Die DSGVO gilt in der EU seit 25. Mai 2018. Mit dem revDSG braucht jede Website eine aktuelle Datenschutzerklärung, die u. a. eingesetzte Tools nennt.",""],
+["recht",2,"Was gilt für Werbe-Newsletter in der Schweiz (UWG)?",["Grundsätzlich vorherige Einwilligung, korrekter Absender, einfache Abmeldung – Ausnahme: Bestandskunden für ähnliche Produkte mit Abmeldemöglichkeit","Alles erlaubt, solange der Inhalt stimmt","Nur Firmen dürfen angeschrieben werden","Ein Impressum genügt, eine Einwilligung braucht es nie"],"Massenwerbung ohne diese Punkte ist unlauter. In der Praxis heisst das: Double-Opt-in und ein Abmeldelink in jeder Mail.",""],
+["recht",2,"Muss ein Onlineshop in der Schweiz klare Angaben zu Identität und Kontaktadresse machen?",["Ja, das UWG verlangt das im elektronischen Geschäftsverkehr","Nein, das gilt nur in Deutschland","Nur ab 1 Mio. CHF Umsatz","Nur, wenn der Shop Cookies nutzt"],"Klare Angaben zu Identität und Kontakt inkl. E-Mail-Adresse – in der Praxis ein Impressum.","Anti Matcha Club: Impressum im Footer prüfen."],
+["recht",2,"Ein Influencer postet Produkte, die er von einer Marke gratis bekommen hat. Was gilt?",["Kommerzielle Kommunikation muss als solche erkennbar sein, z. B. mit «Werbung»","Gratisprodukte sind nie Werbung","Kennzeichnung erst ab 10'000 Followern","Nur die Marke muss kennzeichnen"],"Schleichwerbung ist unlauter. Die Schweizerische Lauterkeitskommission verlangt eine klare Kennzeichnung – das betrifft Marke und Influencer.",""],
+["recht",3,"Brauchst du für Tracking-Cookies auf einer rein schweizerischen Website zwingend ein Opt-in?",["Nach Schweizer Recht grundsätzlich nicht – aber Information und Ablehnungsmöglichkeit; zielst du auf EU-Nutzer, gilt die DSGVO mit Opt-in","Ja, immer, genau wie in der EU","Nein, Cookies sind in der Schweiz gar nicht geregelt","Nur bei Onlineshops"],"Das Fernmeldegesetz verlangt Information und eine Möglichkeit zur Ablehnung. Für Google Ads (Remarketing) verlangt Google aber auch für die Schweiz eine Einwilligung.",""],
+["recht",3,"Ist vergleichende Werbung in der Schweiz erlaubt?",["Ja, wenn sie nicht unrichtig, irreführend, unnötig herabsetzend oder anlehnend ist","Nein, grundsätzlich verboten","Nur mit Zustimmung des Konkurrenten","Nur im B2B"],"Vergleiche müssen sachlich und überprüfbar sein. «Günstiger als X» nur, wenn es wirklich stimmt und vergleichbar ist.",""],
+["recht",1,"Du nimmst für einen Post ein Bild aus der Google-Bildersuche. Problem?",["Ja – Urheberrecht; du brauchst eine Lizenz oder eigene Bilder","Nein, alles im Internet ist frei","Nein, solange du den Fotografen markierst","Nur, wenn du damit Werbung schaltest"],"Markieren ersetzt keine Lizenz. Eigene Fotos, lizenzierte Stockbilder oder schriftliche Erlaubnis.",""]
+];
+const bank=B.map((r,i)=>({id:"b"+i,t:r[0],l:r[1],q:r[2],o:r[3],e:r[4],p:r[5]||""}));
+const IV=[6e5,864e5,2592e5,6048e5,13824e5,3024e6];
+const RANKS=[[0,"Einsteiger"],[300,"Junior"],[900,"Specialist"],[2000,"Senior"],[4000,"Lead"],[7000,"Profi"]];
+const PROJ={performandes:"Performandes – Nunos eigene Marke für Websites und Online Marketing für KMU (Websites mit Craft CMS, SEO, Social Media), Sitz Luzern",outbreak:"Outbreak – ein Tattoostudio in Luzern (Website, lokale Suche/Google Business Profile, Instagram)",amc:"Anti Matcha Club (antimatchaclub.com) – eine kleine Lifestyle-Marke, die Beutel verkauft (Website, Social Media, E-Commerce)"};
+let S={p:{},xp:0,streak:0,last:"",extra:[],cases:[]};
+let fTopic="all",fLevel=0,mode="train",cur=null,answered=false,recent=[],exam=null,cs=null,sample=null,dbRef=null,saveT=null,resetArm=false;
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const all=()=>bank.concat(S.extra||[]);
+const today=()=>new Date().toLocaleDateString("sv");
+function toast(t){const e=$("toast");e.textContent=t;e.classList.add("on");clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove("on"),2600)}
+try{const s=localStorage.getItem("mkt-trainer-v1");if(s)Object.assign(S,JSON.parse(s))}catch(e){}
+function save(){try{localStorage.setItem("mkt-trainer-v1",JSON.stringify(S))}catch(e){}
+  if(dbRef){clearTimeout(saveT);saveT=setTimeout(()=>{dbRef.set(JSON.parse(JSON.stringify(S))).catch(()=>{})},1200)}}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function pool(){return all().filter(q=>(fTopic==="all"||q.t===fTopic)&&(!fLevel||q.l===fLevel))}
+function weight(q,now){const s=S.p[q.id];if(!s)return 3;if(s.d<=now)return 4+(5-s.b);return .6/(s.b+1)}
+function pick(){let P=pool();if(mode==="weak")P=P.filter(q=>{const s=S.p[q.id];return s&&s.w>0&&s.b<3});if(!P.length)return null;
+  const now=Date.now();let C=P.filter(q=>!recent.includes(q.id));if(!C.length)C=P;const ws=C.map(q=>weight(q,now));
+  let r=Math.random()*ws.reduce((a,b)=>a+b,0);for(let i=0;i<C.length;i++){r-=ws[i];if(r<=0)return C[i]}return C[C.length-1]}
+function grade(q,ok){const now=Date.now();const s=S.p[q.id]||{b:0,d:0,w:0,c:0};
+  if(ok){s.c++;s.b=Math.min(5,s.b+1);s.d=now+IV[s.b];S.xp+=q.l*10}else{s.w++;s.b=0;s.d=now+IV[0]}
+  S.p[q.id]=s;const t=today();if(S.last!==t){const y=new Date(Date.now()-864e5).toLocaleDateString("sv");S.streak=S.last===y?S.streak+1:1;S.last=t}save()}
+function rank(){let r=RANKS[0],n=null;for(let i=0;i<RANKS.length;i++){if(S.xp>=RANKS[i][0]){r=RANKS[i];n=RANKS[i+1]||null}}return[r,n]}
+function mastery(t){const qs=all().filter(q=>!t||q.t===t);if(!qs.length)return[0,0,0];let m=0,seen=0;qs.forEach(q=>{const s=S.p[q.id];if(s){seen++;m+=Math.min(s.b,4)/4}});return[Math.round(m/qs.length*100),seen,qs.length]}
+function renderStats(){const[r,n]=rank();const due=all().filter(q=>S.p[q.id]&&S.p[q.id].d<=Date.now()).length;
+  $("stats").innerHTML=`<div>Rang<b>${r[1]}</b></div><div>XP<b>${S.xp}${n?` <span class="sub">/ ${n[0]}</span>`:""}</b></div><div>Serie<b>${S.streak} ${S.streak===1?"Tag":"Tage"}</b></div><div>Fällig<b>${due}</b></div>`}
+function renderSkills(){const[m,seen,tot]=mastery();$("overall").textContent=`Gesamt ${m} % sicher · ${seen} von ${tot} Fragen gesehen`;
+  const rows=Object.keys(T).map(k=>({k,v:mastery(k)}));const weakest=rows.filter(r=>r.v[2]).sort((a,b)=>a.v[0]-b.v[0])[0];
+  $("skills").innerHTML=rows.map(r=>`<button class="skill${r.v[0]<40&&r.v[1]?" weak":""}" data-t="${r.k}"><span class="name">${T[r.k]}</span><span class="pct">${r.v[0]} %</span><span class="bar"><i style="width:${r.v[0]}%"></i></span></button>`).join("");
+  const cases=(S.cases||[]).slice(-3).reverse();
+  $("next").innerHTML=`<b>Nächster Schritt</b><br><span class="sub">Schwächstes Thema:</span> ${weakest?T[weakest.k]:"–"}
+   <div class="row" style="margin-top:10px"><button class="btn ghost" id="goWeak">${weakest?T[weakest.k]+" üben":"Training starten"}</button></div>
+   ${cases.length?`<div style="margin-top:14px"><b>Letzte Praxis-Cases</b>${cases.map(c=>`<div class="sub">${esc(c.date)} · ${esc(c.title)} · <b>${c.score}/10</b></div>`).join("")}</div>`:""}`;
+  $("goWeak").onclick=()=>{if(weakest){fTopic=weakest.k;$("fT").value=fTopic}setMode("train")}}
+function renderAll(){renderStats();renderSkills()}
+function qMeta(q){const s=S.p[q.id];return`<div class="meta"><span>${T[q.t]||q.t}</span><span>${LV[q.l]||""}</span><span>${s?`Box ${s.b}/5 · ${s.c}× richtig, ${s.w}× falsch`:"Neu"}</span>${q.id[0]==="x"?"<span>von Claude</span>":""}</div>`}
+function showQ(){cur=pick();answered=false;const c=$("card");
+  if(!cur){c.innerHTML=mode==="weak"?`<h2 class="q">Keine Schwächen offen</h2><p>In dieser Auswahl hast du gerade keine Fragen, die du falsch hattest und noch nicht sicher kannst. Stark.</p><div class="row"><button class="btn" id="toTrain">Zum Training</button></div>`:`<h2 class="q">Keine Fragen in dieser Auswahl</h2><p>Wähl ein anderes Thema oder Niveau.</p>`;
+    const b=$("toTrain");if(b)b.onclick=()=>setMode("train");return}
+  recent.push(cur.id);if(recent.length>6)recent.shift();cur.ord=shuffle([0,1,2,3]);
+  c.innerHTML=qMeta(cur)+`<h2 class="q">${esc(cur.q)}</h2><div class="opts">${cur.ord.map((o,i)=>`<button class="opt" data-i="${o}"><span class="k">${i+1}</span><span>${esc(cur.o[o])}</span></button>`).join("")}</div><div id="fbx"></div>`;
+  c.querySelectorAll(".opt").forEach(b=>b.onclick=()=>answer(+b.dataset.i))}
+function answer(i){if(answered||!cur)return;answered=true;const ok=i===0;grade(cur,ok);
+  $("card").querySelectorAll(".opt").forEach(b=>{b.disabled=true;const d=+b.dataset.i;if(d===0)b.classList.add("ok");else if(d===i)b.classList.add("bad")});
+  $("fbx").innerHTML=`<div class="fb"><div class="verdict ${ok?"ok":"bad"}">${ok?`Richtig. +${cur.l*10} XP`:"Nicht ganz – das kommt in 10 Minuten wieder."}</div><div>${esc(cur.e)}</div>${cur.p?`<div class="tip"><b>Praxis:</b> ${esc(cur.p)}</div>`:""}<div id="aix"></div>
+   <div class="row"><button class="btn" id="nextQ">Weiter →</button><button class="btn ghost needai" id="more">Genauer erklären</button><span class="sub">Tasten 1–4 · Enter</span></div></div>`;
+  $("nextQ").onclick=showQ;$("more").onclick=explain;$("nextQ").focus();renderAll()}
+async function explain(){if(!sample||!cur)return;const box=$("aix");$("more").disabled=true;box.innerHTML='<div class="ai-box">Claude denkt nach …</div>';const el=box.firstChild;
+  const p=`Du bist ein erfahrener Online-Marketing-Trainer. Erkläre dem Lernenden (Quereinsteiger aus IT/Daten ins Marketing, lebt in Luzern) die folgende Quizfrage vertiefend: warum die richtige Antwort stimmt, warum die falschen nicht, und ein konkretes Praxisbeispiel. Max. 180 Wörter, Deutsch mit Schweizer Schreibweise (ss statt ß), kein Markdown ausser Zeilenumbrüchen.\n\nFrage: ${cur.q}\nRichtig: ${cur.o[0]}\nFalsch: ${cur.o.slice(1).join(" | ")}\nKurz-Erklärung: ${cur.e}`;
+  try{await sample(p,{onText:({text})=>{el.textContent=text}})}catch(e){el.textContent=aiErr(e)}}
+function aiErr(e){if(e&&e.code==="not_granted"){sample=null;document.body.classList.remove("ai");return"Claude ist hier nicht freigegeben."}if(e&&e.code==="rate_limited")return"Gerade zu viele Anfragen – versuch es in einer Minute nochmals.";return"Das hat nicht geklappt. Versuch es nochmals."}
+/* Prüfung */
+function startExam(){const P=shuffle(pool().length>=20?pool():all()).slice(0,20);exam={qs:P,i:0,res:[]};examQ()}
+function examQ(){const c=$("card");if(!exam){c.innerHTML=`<h2 class="q">Prüfungsmodus</h2><p>20 Fragen aus deiner Auswahl, ohne Zwischenfeedback – wie bei den Google-Ads-Zertifizierungen. Bestanden ab 80 %. Am Ende siehst du alle Fehler mit Erklärung.</p><div class="row"><button class="btn red" id="go">Prüfung starten</button></div>`;$("go").onclick=startExam;return}
+  if(exam.i>=exam.qs.length)return examEnd();const q=exam.qs[exam.i];cur=q;q.ord=shuffle([0,1,2,3]);
+  c.innerHTML=`<div class="prog"><i style="width:${exam.i/exam.qs.length*100}%"></i></div><div class="meta"><span>Frage ${exam.i+1} / ${exam.qs.length}</span><span>${T[q.t]}</span><span>${LV[q.l]}</span></div><h2 class="q">${esc(q.q)}</h2><div class="opts">${q.ord.map((o,i)=>`<button class="opt" data-i="${o}"><span class="k">${i+1}</span><span>${esc(q.o[o])}</span></button>`).join("")}</div>`;
+  answered=false;c.querySelectorAll(".opt").forEach(b=>b.onclick=()=>examAns(+b.dataset.i))}
+function examAns(i){if(answered)return;answered=true;const q=exam.qs[exam.i];grade(q,i===0);exam.res.push({q,i});exam.i++;renderAll();examQ()}
+function examEnd(){const ok=exam.res.filter(r=>r.i===0).length,pct=Math.round(ok/exam.res.length*100),wrong=exam.res.filter(r=>r.i!==0);
+  $("card").innerHTML=`<div class="meta"><span>Prüfung beendet</span></div><div class="big" style="color:${pct>=80?"var(--ok)":"var(--red)"}">${pct} %</div><h2 class="q" style="margin-top:8px">${pct>=80?"Bestanden.":"Noch nicht bestanden (ab 80 %)."} ${ok} von ${exam.res.length} richtig.</h2>
+   ${wrong.map(r=>`<div class="review"><b>${esc(r.q.q)}</b><br><span style="color:var(--bad)">Deine Antwort: ${esc(r.q.o[r.i])}</span><br><span style="color:var(--ok)">Richtig: ${esc(r.q.o[0])}</span><br><span class="sub">${esc(r.q.e)}</span></div>`).join("")}
+   <div class="row"><button class="btn red" id="again">Neue Prüfung</button>${wrong.length?'<button class="btn ghost" id="toWeak">Fehler gezielt üben</button>':""}</div>`;
+  $("again").onclick=startExam;const w=$("toWeak");if(w)w.onclick=()=>setMode("weak");exam=null}
+/* Praxis-Case */
+function caseView(){const c=$("card");
+  if(!sample){c.innerHTML=`<h2 class="q">Praxis-Cases mit Claude</h2><p>Hier stellt dir Claude realistische Aufgaben zu deinen Projekten und bewertet deine Lösung wie ein Senior-Marketer. Das funktioniert, wenn du die App auf claude.ai geöffnet hast und Claude die Freigabe gibst.</p><p class="sub">Falls nichts passiert: Seite neu laden.</p>`;return}
+  if(!cs||cs.stage==="pick"){c.innerHTML=`<h2 class="q">Praxis-Case</h2><p>Claude erstellt eine konkrete Aufgabe zu einem deiner Projekte – du löst sie schriftlich und bekommst eine Bewertung mit Musterlösung. So trainierst du das, was im Job zählt: Entscheiden und begründen.</p>
+    <div class="filters"><label for="cP">Projekt</label><select id="cP"><option value="outbreak">Outbreak</option><option value="amc">Anti Matcha Club</option><option value="performandes">Performandes</option><option value="any">Zufällig</option></select></div>
+    <p class="sub">Thema und Niveau kommen aus der Auswahl oben.</p><div class="row"><button class="btn red" id="mk">Case erstellen</button></div><div id="cErr" class="sub"></div>`;
+    $("mk").onclick=makeCase;return}
+  if(cs.stage==="work"){c.innerHTML=`<div class="meta"><span>${esc(cs.proj)}</span><span>${esc(cs.topic)}</span><span>${esc(cs.level)}</span></div><h2 class="q">${esc(cs.c.title)}</h2><p>${esc(cs.c.situation)}</p><div class="tip"><b>Deine Aufgabe:</b> ${esc(cs.c.aufgabe)}</div>
+    <p class="sub" style="margin-top:14px">Bewertet wird u. a.: ${(cs.c.kriterien||[]).map(esc).join(" · ")}</p>
+    <label for="ans" class="sub">Deine Lösung</label><textarea id="ans" placeholder="Schreib deine Lösung in Stichworten oder Sätzen …">${esc(cs.ans||"")}</textarea>
+    <div class="row"><button class="btn red" id="gr">Bewerten lassen</button><button class="btn ghost" id="nw">Anderer Case</button><span id="cErr" class="sub"></span></div>`;
+    $("ans").oninput=e=>cs.ans=e.target.value;$("gr").onclick=gradeCase;$("nw").onclick=()=>{cs=null;caseView()};return}
+  if(cs.stage==="done"){const g=cs.g;c.innerHTML=`<div class="meta"><span>${esc(cs.c.title)}</span></div><div class="big" style="color:${g.score>=7?"var(--ok)":g.score>=5?"var(--slate)":"var(--red)"}">${g.score}/10</div><h2 class="q" style="margin-top:8px;font-size:22px">${esc(g.fazit)}</h2>
+    <b>Das war stark</b><ul class="clean">${(g.stark||[]).map(x=>`<li>${esc(x)}</li>`).join("")}</ul><b>Das fehlt noch</b><ul class="clean">${(g.fehlt||[]).map(x=>`<li>${esc(x)}</li>`).join("")}</ul>
+    <div class="tip"><b>Musterlösung:</b> ${esc(g.muster)}</div><div class="row"><button class="btn red" id="nw">Nächster Case</button></div>`;$("nw").onclick=()=>{cs=null;caseView()}}}
+async function makeCase(){let pk=$("cP").value;if(pk==="any")pk=shuffle(Object.keys(PROJ))[0];const tk=fTopic==="all"?shuffle(Object.keys(T))[0]:fTopic,lv=LV[fLevel||2];
+  $("mk").disabled=true;$("mk").textContent="Claude schreibt den Case …";
+  const p=`Erstelle eine realistische Praxisaufgabe (Case) im Online Marketing für einen Lernenden, der vom IT-/Datenbereich ins Marketing wechselt und Profi werden will.\nProjekt: ${PROJ[pk]}\nThema: ${T[tk]}\nNiveau: ${lv}\nDie Aufgabe soll in 10–15 Minuten schriftlich lösbar sein, eine konkrete Situation mit plausiblen Zahlen enthalten (als Annahmen kennzeichnen) und eine klare Frage stellen, die eine Entscheidung mit Begründung verlangt. Deutsch, Schweizer Schreibweise (ss statt ß).\nAntworte NUR mit JSON: {"title":"kurzer Titel","situation":"3–5 Sätze","aufgabe":"1–3 Sätze, was genau zu tun ist","kriterien":["3–5 kurze Bewertungskriterien"]}`;
+  try{const c=await sample.json(p,{modelTier:"default"});if(!c||!c.title||!c.aufgabe)throw 0;cs={stage:"work",c,proj:PROJ[pk].split(" – ")[0],topic:T[tk],level:lv,ans:""};caseView()}
+  catch(e){$("mk").disabled=false;$("mk").textContent="Case erstellen";$("cErr").textContent=aiErr(e)}}
+async function gradeCase(){const a=(cs.ans||"").trim();if(a.length<40){$("cErr").textContent="Schreib etwas mehr – mindestens ein paar Sätze.";return}
+  $("gr").disabled=true;$("gr").textContent="Claude bewertet …";
+  const p=`Du bist Senior Online Marketing Manager und bewertest die Lösung eines Lernenden streng, fair und konkret. Niveau der Aufgabe: ${cs.level}.\nCase: ${cs.c.title}\nSituation: ${cs.c.situation}\nAufgabe: ${cs.c.aufgabe}\nKriterien: ${(cs.c.kriterien||[]).join("; ")}\n\nLösung des Lernenden:\n"""${a.slice(0,4000)}"""\n\nBewerte von 0 bis 10 (7 = solide Junior-Lösung, 9–10 = Profi). Deutsch, Schweizer Schreibweise (ss). Antworte NUR mit JSON: {"score":Zahl,"fazit":"1 Satz","stark":["1–3 Punkte"],"fehlt":["1–4 konkrete Punkte"],"muster":"Musterlösung in 5–8 Sätzen"}`;
+  try{const g=await sample.json(p,{modelTier:"default"});if(!g||typeof g.score!=="number")throw 0;g.score=Math.max(0,Math.min(10,Math.round(g.score)));cs.g=g;cs.stage="done";
+    S.xp+=g.score*5;(S.cases=S.cases||[]).push({title:cs.c.title,score:g.score,date:today()});if(S.cases.length>30)S.cases.shift();save();renderAll();caseView()}
+  catch(e){$("gr").disabled=false;$("gr").textContent="Bewerten lassen";$("cErr").textContent=aiErr(e)}}
+/* KI-Fragen */
+async function genQ(){if(!sample)return;const b=$("genQ");const tk=fTopic==="all"?shuffle(Object.keys(T))[0]:fTopic,lv=fLevel||2;
+  b.disabled=true;b.textContent=`Claude schreibt Fragen zu ${T[tk]} …`;
+  const have=all().filter(q=>q.t===tk).map(q=>"- "+q.q).join("\n").slice(0,3500);
+  const p=`Du bist Prüfungsautor für Online Marketing. Erstelle 5 neue Multiple-Choice-Fragen zum Thema «${T[tk]}», Niveau «${LV[lv]}», auf Deutsch mit Schweizer Schreibweise (ss statt ß). Fachlich korrekt und aktuell (Stand ${today()}), praxisnah, gern mit kleinen Rechenaufgaben oder Szenarien. Wenn du dir bei einem Fakt nicht sicher bist, nimm eine andere Frage. Keine Überschneidung mit diesen bestehenden Fragen:\n${have}\n\nJede Frage hat genau eine richtige und drei plausible falsche Antworten (keine «alle oben genannten»).\nAntworte NUR mit JSON: {"questions":[{"q":"Frage","correct":"richtige Antwort","wrong":["falsch","falsch","falsch"],"explain":"2–3 Sätze, warum","tip":"1 Satz Praxis-Tipp für eines dieser Projekte: Tattoostudio Outbreak in Luzern, Lifestyle-Marke Anti Matcha Club, Webagentur Performandes"}]}`;
+  try{const r=await sample.json(p,{modelTier:"default"});const qs=(r&&r.questions||[]).filter(x=>x&&x.q&&x.correct&&Array.isArray(x.wrong)&&x.wrong.length>=3);if(!qs.length)throw 0;
+    const now=Date.now();qs.forEach((x,i)=>S.extra.push({id:"x"+now+i,t:tk,l:lv,q:String(x.q),o:[x.correct,...x.wrong.slice(0,3)].map(String),e:String(x.explain||""),p:String(x.tip||"")}));
+    if(S.extra.length>200)S.extra=S.extra.slice(-200);save();renderAll();toast(`${qs.length} neue Fragen zu ${T[tk]} hinzugefügt`);if(mode==="train"){fTopic=tk;$("fT").value=tk;showQ()}}
+  catch(e){toast(aiErr(e))}b.disabled=false;b.textContent="+5 neue Fragen von Claude"}
+/* Navigation */
+function setMode(m){mode=m;exam=null;document.querySelectorAll("#modes button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.m===m));
+  if(m==="exam")examQ();else if(m==="case")caseView();else showQ()}
+$("fT").innerHTML=`<option value="all">Alle Themen</option>`+Object.keys(T).map(k=>`<option value="${k}">${T[k]}</option>`).join("");
+$("fT").onchange=e=>{fTopic=e.target.value;if(mode!=="case")setMode(mode)};$("fL").onchange=e=>{fLevel=+e.target.value;if(mode!=="case")setMode(mode)};
+$("modes").onclick=e=>{const b=e.target.closest("button");if(b)setMode(b.dataset.m)};
+$("skills").onclick=e=>{const b=e.target.closest(".skill");if(!b)return;fTopic=b.dataset.t;$("fT").value=fTopic;setMode(mode==="case"?"case":mode==="exam"?"exam":"train")};
+$("reset").onclick=()=>{if(!resetArm){resetArm=true;$("reset").textContent="Wirklich alles löschen? Nochmals klicken";setTimeout(()=>{resetArm=false;$("reset").textContent="Fortschritt zurücksetzen"},4000);return}
+  S={p:{},xp:0,streak:0,last:"",extra:[],cases:[]};save();resetArm=false;$("reset").textContent="Fortschritt zurücksetzen";renderAll();setMode("train");toast("Fortschritt zurückgesetzt")};
+document.addEventListener("keydown",e=>{if(/TEXTAREA|SELECT|INPUT/.test(e.target.tagName))return;
+  if((mode==="train"||mode==="weak"||mode==="exam")&&!answered&&cur&&cur.ord&&/^[1-4]$/.test(e.key)){const o=cur.ord[+e.key-1];if(mode==="exam")examAns(o);else answer(o)}
+  else if(e.key==="Enter"&&answered&&(mode==="train"||mode==="weak")&&$("nextQ")){e.preventDefault();showQ()}});
+renderAll();setMode("train");
+if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))}
+}
+</script>
+</body>
+</html>
