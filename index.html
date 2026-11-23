@@ -330,7 +330,7 @@ document.addEventListener("keydown",e=>{if(/TEXTAREA|SELECT|INPUT/.test(e.target
   if((mode==="train"||mode==="weak"||mode==="exam")&&!answered&&cur&&cur.ord&&/^[1-4]$/.test(e.key)){const o=cur.ord[+e.key-1];if(mode==="exam")examAns(o);else answer(o)}
   else if(e.key==="Enter"&&answered&&(mode==="train"||mode==="weak")&&$("nextQ")){e.preventDefault();showQ()}});
 renderAll();setMode("train");
-if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))}
+if("serviceWorker" in navigator){window.addEventListener("load",()=>{navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).then(r=>r.update()).catch(()=>{});let done=false;navigator.serviceWorker.addEventListener("controllerchange",()=>{if(!done){done=true;location.reload()}})})}
 }
 </script>
 </body>
